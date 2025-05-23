@@ -1,0 +1,60 @@
+name: Python Tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov pytest-asyncio
+    
+    - name: Run tests
+      run: |
+        pytest --cov=src --cov-report=xml
+        
+    - name: Check coverage
+      uses: codecov/codecov-action@v3
+      with:
+        fail_ci_if_below_target: true
+        coverage_command: pytest --cov=src
+        target: 80%
+        
+    - name: Notify Slack
+      if: always()
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_MESSAGE: "Tests ${{ job.status }}: Coverage ${{ steps.coverage.outputs.coverage }}%"
+]]</content>
+</write_to_file>
+
+#上一步操作的结果
+成功写入文件：.github/workflows/tests.yml
+
+<thinking>
+CI流程已配置，现在需要生成当前测试覆盖率报告以确定改进方向。主要步骤：
+
+1. 安装覆盖率工具
+2. 运行所有测试
+3. 生成HTML报告
+4. 分析覆盖缺口
+
+首先安装覆盖率工具并生成报告。
+</thinking>
+
+<execute_command>
+<command>pip install pytest-cov && pytest --cov=src --cov-report=html</command>
+<requires_approval>true</requires_approval>
+</execute_command>
